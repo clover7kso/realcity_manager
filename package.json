@@ -1,0 +1,39 @@
+{
+  "name": "realcity_manager",
+  "version": "1.0.0",
+  "description": "This is manager for RealCity",
+  "dependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/runtime": "^7.11.2",
+    "@prisma/client": "^2.15.0",
+    "copy": "^0.3.2",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.1.5",
+    "memory-cache": "^0.2.0",
+    "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@prisma/cli": "^2.15.0",
+    "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "dev": "nodemon --exec babel-node src/server.js",
+    "db_studio": "prisma studio",
+    "db_pull": "prisma introspect & prisma generate",
+    "db_push": "npx prisma db push --preview-feature & prisma generate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clover7kso/carmunity_backend.git"
+  },
+  "author": "DevWoon",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/clover7kso/carmunity_backend/issues"
+  },
+  "homepage": "https://github.com/clover7kso/carmunity_backend#readme"
+}

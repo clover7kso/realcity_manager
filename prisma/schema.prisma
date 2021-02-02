@@ -1,0 +1,192 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["groupBy", "nativeTypes"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = "mysql://realcity_rds:rck210118!@realcity-backend.cgst5ny2clef.ap-northeast-2.rds.amazonaws.com:3306/REALCITY_DB"
+}
+
+enum BanDate {
+  NOPE
+  NEED_MANAGING
+  DAY1
+  DAY3
+  WEEK1
+  WEEK2
+  WEEK4
+  FOREVER
+}
+
+enum BanReason {
+  NOPE
+  NEED_MANAGING
+  SEXSURE
+  POLITICS
+  GORE
+  COMMERCE
+  SPAM
+  ILLEGAL
+  OTHERS
+}
+
+model User {
+  id             String    @id @default(cuid())
+  email          String
+  socialId       String
+  socialType     String
+  nickname       String
+  point          Int       @default(0)
+  gamblePosition Int       @default(0)
+  gambleChance   Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime? @updatedAt
+  agreeUsage     Boolean   @default(true)
+  agreePrivacy   Boolean   @default(true)
+  agreeMarketing Boolean   @default(false)
+
+  Post       Post[]
+  Comment    Comment[]
+  BanManager BanManager?
+  @@unique([socialId, socialType], name: "social_user_unique")
+  @@unique([nickname], name: "nickname_unique")
+}
+
+model BanManager {
+  id            String    @id @default(cuid())
+  userNick      String
+  blockedUntil  BanDate   @default(NEED_MANAGING)
+  blockedReason BanReason @default(NEED_MANAGING)
+  blockedNum    Int       @default(0)
+  blockedDate   DateTime? @updatedAt
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userNick], references: [nickname])
+
+  ReportPost    ReportPost[]
+  ReportComment ReportComment[]
+  @@unique([userNick], name: "nickname_unique")
+}
+
+model Post {
+  id         String       @id @default(cuid())
+  ip         String       @default("작자미상")
+  category   String       @default("자유게시판")
+  title      String       @db.Text
+  content    String       @db.Text
+  author     String?      @default("누구세요")
+  password   String?      @default("q1w2e3")
+  viewAll    Int          @default(0)
+  likeAll    Int          @default(0)
+  viewToday  Int          @default(0)
+  likeToday  Int          @default(0)
+  published  Boolean      @default(true)
+  manager    Boolean      @default(false)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime?    @updatedAt
+  thumbnail  String?
+  userId     String?
+  user       User?        @relation(fields: [userId], references: [id])
+  Comment    Comment[]
+  Images     Images[]
+  LikePost   LikePost[]
+  ViewPost   ViewPost[]
+  ReportPost ReportPost[]
+}
+
+model Comment {
+  id                   String                 @id @default(cuid())
+  postId               String
+  group                String?
+  ip                   String                 @default("작자미상")
+  content              String                 @db.Text
+  likeAll              Int                    @default(0)
+  dislikeAll           Int                    @default(0)
+  author               String?                @default("누구세요")
+  password             String?                @default("q1w2e3")
+  published            Boolean                @default(true)
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime?              @updatedAt
+  userId               String?
+  user                 User?                  @relation(fields: [userId], references: [id])
+  post                 Post                   @relation(fields: [postId], references: [id])
+  ReportComment        ReportComment[]
+  LikeOrDislikeComment LikeOrDislikeComment[]
+}
+
+model Images {
+  id        String    @id @default(cuid())
+  postId    String
+  url       String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  post      Post      @relation(fields: [postId], references: [id])
+}
+
+model LikePost {
+  id        String    @id @default(cuid())
+  postId    String
+  ip        String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  post      Post      @relation(fields: [postId], references: [id])
+
+  @@unique([postId, ip], name: "like_post_unique")
+}
+
+model LikeOrDislikeComment {
+  id        String    @id @default(cuid())
+  commentId String
+  ip        String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  comment   Comment   @relation(fields: [commentId], references: [id])
+
+  @@unique([commentId, ip], name: "like_or_dislike_comment_unique")
+}
+
+model ViewPost {
+  id        String    @id @default(cuid())
+  postId    String
+  ip        String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @default(now()) @updatedAt
+  post      Post      @relation(fields: [postId], references: [id])
+
+  @@unique([postId, ip], name: "view_post_unique")
+}
+
+model ReportPost {
+  id         String      @id @default(cuid())
+  postId     String
+  banId      String?
+  ip         String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime?   @default(now()) @updatedAt
+  post       Post        @relation(fields: [postId], references: [id])
+  banManager BanManager? @relation(fields: [banId], references: [id])
+
+  @@unique([postId, ip], name: "report_post_unique")
+}
+
+model ReportComment {
+  id         String      @id @default(cuid())
+  commentId  String
+  banId      String?
+  ip         String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime?   @default(now()) @updatedAt
+  comment    Comment     @relation(fields: [commentId], references: [id])
+  banManager BanManager? @relation(fields: [banId], references: [id])
+
+  @@unique([commentId, ip], name: "report_comment_unique")
+}
+
+model Notice {
+  id        String    @id @default(cuid())
+  title     String    @default("제목미상")
+  content   String    @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  published Boolean   @default(true)
+}
