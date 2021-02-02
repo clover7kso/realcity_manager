@@ -10,10 +10,11 @@
     "@babel/runtime": "^7.11.2",
     "@prisma/client": "^2.15.0",
     "copy": "^0.3.2",
-    "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
+    "express": "^4.17.1",
     "memory-cache": "^0.2.0",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "node-cron": "^2.0.3"
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.11.5",
