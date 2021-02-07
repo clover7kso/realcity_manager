@@ -37,6 +37,52 @@ const conditionList = [
   { ban: "WEEK2", day: 14 },
   { ban: "WEEK4", day: 28 },
 ];
+
+const setBanManager = async () => {
+  let today = new Date();
+  let dateResult = new Date();
+
+  for (var i = 0; i < conditionList.length; i++) {
+    dateResult.setDate(today.getDate() - conditionList[i].day);
+    try {
+      const result = await prisma.banManager.updateMany({
+        where: {
+          blockedUntil: conditionList[i].ban,
+          blockedDate: { lt: dateResult },
+        },
+        data: {
+          blockedUntil: "NOPE",
+          blockedReason: "NOPE",
+          blockedDate: null,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
+
+const setPostTodayViewAndLike = async () => {
+  const result = await prisma.post.updateMany({
+    data: { viewToday: 0, likeToday: 0 },
+  });
+  console.log(result);
+};
+
+const setGambleChance = async () => {
+  const result = await prisma.user.updateMany({
+    data: { gambleChance: 5 },
+  });
+  console.log(result);
+};
+
+const resetGambleChance = async () => {
+  const result = await prisma.user.updateMany({
+    data: { gambleChance: 0 },
+  });
+  console.log(result);
+};
+
 var https = require("https");
 
 //초 분 시 일 월 요일//
@@ -45,23 +91,9 @@ cron.schedule("* * 0 * * *", function () {
   console.log("매일 12시");
 
   console.log("모든게시글의 당일 조회수 좋아요수 초기화");
-  prisma.post.updateMany({
-    data: { viewToday: 0, likeToday: 0 },
-  });
 
-  console.log("벤유저관리");
-  let today = new Date();
-  let dateResult = new Date();
-  for (var i = 0; i < conditionList.length; i++) {
-    dateResult.setDate(today.getDate() - conditionList[i].day);
-    prisma.banManager.updateMany({
-      where: {
-        blockedUntil: conditionList[i].ban,
-        blockedDate: { lt: dateResult },
-      },
-      data: { blockedUntil: "NOPE", blockedReason: "NOPE", blockedDate: null },
-    });
-  }
+  setPostTodayViewAndLike();
+  setBanManager();
 
   https
     .get("https://hc-ping.com/d7585c8f-7e36-47ba-96c4-eb4eb83a4ade")
@@ -74,9 +106,8 @@ cron.schedule("* * 0 * * Saturday", function () {
   console.log("토요일자정");
 
   console.log("겜블찬스 5회");
-  prisma.user.updateMany({
-    data: { gambleChance: 5 },
-  });
+
+  setGambleChance();
 
   https
     .get("https://hc-ping.com/5030d5c2-2fc7-434f-bc27-7cf206246068")
@@ -89,12 +120,21 @@ cron.schedule("* * 0 * * Sunday", function () {
   console.log("일요일자정");
 
   console.log("겜블찬스 초기화");
-  prisma.user.updateMany({
-    data: { gambleChance: 0 },
-  });
+
+  resetGambleChance();
 
   https
     .get("https://hc-ping.com/2383d57a-466f-43f5-be9f-11c46a7478d8")
+    .on("error", (err) => {
+      console.log("Ping failed: " + err);
+    });
+});
+
+cron.schedule("0 */5 * * * *", function () {
+  console.log("건강체크");
+
+  https
+    .get("https://hc-ping.com/91695e8c-479f-47b4-a08c-d80c51a582f5")
     .on("error", (err) => {
       console.log("Ping failed: " + err);
     });
