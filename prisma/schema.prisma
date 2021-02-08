@@ -5,7 +5,7 @@ generator client {
 
 datasource db {
   provider = "mysql"
-  url      = "mysql://realcity_rds:rck210118!@realcity-backend.cgst5ny2clef.ap-northeast-2.rds.amazonaws.com:3306/REALCITY_DB"
+  url      = "mysql://realcity_rds:rck210118!@realcity-database.cgst5ny2clef.ap-northeast-2.rds.amazonaws.com:3306/realcity_db"
 }
 
 enum BanDate {
