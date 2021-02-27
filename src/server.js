@@ -114,7 +114,7 @@ cron.schedule("0 */5 * * * *", function () {
     });
 });
 
-cron.schedule("* * 0 * *", function () {
+cron.schedule("* * 0 * * *", function () {
   console.log("매일 12시");
 
   console.log("겜블찬스 5회");
