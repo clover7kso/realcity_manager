@@ -76,12 +76,14 @@ const setGambleChance = async () => {
   console.log(result);
 };
 
+/*
 const resetGambleChance = async () => {
   const result = await prisma.user.updateMany({
     data: { gambleChance: 0 },
   });
   console.log(result);
 };
+*/
 
 var https = require("https");
 
@@ -102,6 +104,31 @@ cron.schedule("* * 0 * * *", function () {
     });
 });
 
+cron.schedule("0 */5 * * * *", function () {
+  console.log("건강체크");
+
+  https
+    .get("https://hc-ping.com/91695e8c-479f-47b4-a08c-d80c51a582f5")
+    .on("error", (err) => {
+      console.log("Ping failed: " + err);
+    });
+});
+
+cron.schedule("* * 0 * *", function () {
+  console.log("매일 12시");
+
+  console.log("겜블찬스 5회");
+
+  setGambleChance();
+
+  https
+    .get("https://hc-ping.com/939126d8-3a18-4508-afe6-73ee50df959d")
+    .on("error", (err) => {
+      console.log("Ping failed: " + err);
+    });
+});
+
+/*
 cron.schedule("* * 0 * * Saturday", function () {
   console.log("토요일자정");
 
@@ -116,6 +143,7 @@ cron.schedule("* * 0 * * Saturday", function () {
     });
 });
 
+
 cron.schedule("* * 0 * * Sunday", function () {
   console.log("일요일자정");
 
@@ -129,13 +157,4 @@ cron.schedule("* * 0 * * Sunday", function () {
       console.log("Ping failed: " + err);
     });
 });
-
-cron.schedule("0 */5 * * * *", function () {
-  console.log("건강체크");
-
-  https
-    .get("https://hc-ping.com/91695e8c-479f-47b4-a08c-d80c51a582f5")
-    .on("error", (err) => {
-      console.log("Ping failed: " + err);
-    });
-});
+*/
